@@ -1,0 +1,6 @@
+@ClincalWorkFlow_HostAddress = http://localhost:5250
+
+GET {{ClincalWorkFlow_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
