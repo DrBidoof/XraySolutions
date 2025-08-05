@@ -1,5 +1,8 @@
-﻿using ClincalWorkFlow.Services;
+using ClincalWorkFlow.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace ClincalWorkFlow.Controllers
 {
@@ -26,6 +29,31 @@ namespace ClincalWorkFlow.Controllers
 
             return Ok(new
             {
+                Cluster = result.PredictedClusterId,
+                MinDistance = minDistance,
+                IsAnomaly = isAnomaly
+            });
+        }
+
+        [HttpPost("Upload")]
+        public async Task<IActionResult> PredictUpload([FromForm] IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+                return BadRequest("No file received.");
+
+            var tempPath = Path.GetTempFileName();
+            using (var stream = System.IO.File.Create(tempPath))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            var result = predictor.Predict(tempPath);
+            System.IO.File.Delete(tempPath);
+
+            var minDistance = result.Score.Min();
+            var isAnomaly = minDistance > 5.0f;
+
+            return Ok(new {
                 Cluster = result.PredictedClusterId,
                 MinDistance = minDistance,
                 IsAnomaly = isAnomaly
