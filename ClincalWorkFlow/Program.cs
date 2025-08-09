@@ -1,6 +1,7 @@
 using ClincalWorkFlow.Services;
 using Microsoft.AspNetCore.Http.Features;      // if you later tweak upload limits
 using Microsoft.AspNetCore.HttpOverrides;     // forwarded headers (Render proxy)
+using XrayAPI.Options;
 
 namespace ClincalWorkFlow
 {
@@ -33,7 +34,7 @@ namespace ClincalWorkFlow
                           .AllowAnyHeader()
                           .AllowAnyMethod());
             });
-
+            builder.Services.Configure<AnomalyOptions>(builder.Configuration.GetSection("Anomaly"));
             var app = builder.Build();
 
             // === Middleware ===
